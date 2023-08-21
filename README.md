@@ -256,3 +256,38 @@ sum(total_amount_spent / points)  as total_cashback_received
 from 
 fetch_data
 group by 1
+
+# Checking out who ever the gold users, what are their overall purchases in first one year after joining gold 
+# and for that one year he earns 5 points for every 10rs he spent on zomato
+# so now what will be his overall amount and how much points each customer has earned on it
+
+-- select 
+-- g.userid,
+-- sum(p.price) as total_price,
+-- sum(price) / 2 as points_earned
+-- from 
+-- goldusers_signup as g 
+-- join 
+-- sales as s 
+-- on g.userid = s.userid
+-- join 
+-- product as p
+-- on s.product_id = p.product_id
+-- where s.created_date between g.gold_signup_date and date_add(g.gold_signup_date, interval 1 year)
+
+-- # Two ways of taking 1 year interval period
+-- -- g.gold_signup_date + interval 1 year
+
+-- group by 1
+-- order by 3 desc
+
+# ranking the customer only when they are gold members else putting them as na 
+
+select 
+*,
+case when g.gold_signup_date is null then 'na' else dense_rank() over(partition by g.userid order by s.created_date desc) end  as ranking_order
+from 
+goldusers_signup as g 
+right join 
+sales as s 
+on g.userid = s.userid and s.created_date >= g.gold_signup_date
